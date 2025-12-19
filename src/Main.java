@@ -1,23 +1,58 @@
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Scanner;
+import models.Account;
+
+import java.util.*;
 
 public class Main {
-
-
+    static Scanner scanner = new Scanner(System.in);
+    static Map<String, Account> accounts = new HashMap<>();
 
     public static void main(String[] args) {
-         String accountNumber;
-         String initialBalance;
-         String pin;
-         int choice;
-         boolean isActive = true;
-        Scanner scanner = new Scanner(System.in);
+        int choice;
+        boolean isActive = true;
 
         System.out.println("Welcome to our bank");
+
+        while (isActive) {
+            System.out.println("1, To create account");
+            System.out.println("2, To access acount");
+            System.out.println("3 to exit");
+
+            choice = scanner.nextInt();
+            scanner.nextLine();
+            switch (choice) {
+                case 1: {
+                    createAccount(scanner, accounts);
+                    break;
+                }
+                case 2: {
+                    getAccount(scanner, accounts);
+                    break;
+                }
+                case 3: {
+                    isActive = false;
+                    break;
+                }
+                default: {
+                    System.out.println("invalid input!");
+                }
+
+
+            }
+
+
+        }
+
+    }
+    public static void createAccount (Scanner scanner, Map < String, Account > accounts){
+        String accountNumber;
+        String initialBalance;
+        String pin;
         System.out.print("Enter account number: ");
         accountNumber = scanner.nextLine();
-
+        if (accounts.containsKey(accountNumber)) {
+            System.out.println("Account already exists!");
+            return;
+        }
         System.out.print("Enter pin number: ");
         pin = scanner.nextLine();
 
@@ -25,103 +60,51 @@ public class Main {
         initialBalance = scanner.nextLine();
         System.out.println();
 
-        Account a1 = new Account(accountNumber, pin, initialBalance);
+
+        Account account = new Account(accountNumber, pin, initialBalance);
+        accounts.put(accountNumber, account);
         System.out.println("you have successfully created an account");
-        System.out.print("Enter PIN to login: ");
-        String inputPin = scanner.nextLine();
+    }
+    public static void getAccount(Scanner scanner, Map<String, Account> accounts) {
 
-        if (!a1.isAuthenticated(inputPin)) {
-            System.out.println("Invalid PIN. Access denied.");
+        scanner.nextLine(); // clear buffer
+
+        System.out.print("Enter Account Number: ");
+        String accountNumber = scanner.nextLine();
+
+        System.out.print("Enter PIN: ");
+        String pin = scanner.nextLine();
+
+        Account myAccount = accounts.get(accountNumber);
+
+        if (myAccount == null) {
+            System.out.println("Account not found!");
             return;
         }
-        while (isActive) {
-            System.out.println("1, To get account number");
-            System.out.println("2, To Deposit");
-            System.out.println("3, to withdraw");
-            System.out.println("4, to get balance");
-            System.out.println("5 to exit");
 
-            choice = scanner.nextInt();
-            scanner.nextLine();
-            switch (choice) {
-                case 1: {
-                    a1.getAccountNumber();
-                    break;
-                }
-                case 2: {
-                    System.out.print("Enter amount to deposit: ");
-                    String depositAmount = scanner.nextLine();
-                    a1.deposit(new BigDecimal(depositAmount));
-                    break;
-                }
-                case 3: {
-                    System.out.print("Enter amount to withdraw: ");
-                    String withdrawAmount = scanner.nextLine();
-                    a1.withdraw(new BigDecimal(withdrawAmount));
-                    break;
-                }
-                case 4 : {
-                    a1.getBalance();
-                    break;
-                }
-                case 5 : {
-                    isActive = false;
-                    break;
-                }
-                default:{
-                    System.out.println("invalid input!");
-                }
-
-            }
-        }
-
-    }
-}
-class Account{
-    private final String accountNumber;
-    private String pin; // can be updated!
-    private BigDecimal balance;
-    public Account (String accountNumber, String pin, String initialBalance){
-        this.accountNumber = accountNumber;
-        this.pin = pin;
-        this.balance = new BigDecimal(initialBalance).setScale(2, RoundingMode.HALF_UP);
-
-    }
-    public void getAccountNumber(){
-        System.out.println("Your account number is "+accountNumber);
-
-    }
-    public boolean isAuthenticated(String pin){
-        return this.pin.equals(pin);
-    }
-    public void getBalance() {
-        System.out.println("$ " + balance);
-    }
-    public void deposit(BigDecimal amount){
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            System.out.println("Invalid amount!");
+        if (!myAccount.isAuthenticated(pin)) {
+            System.out.println("Invalid PIN!");
             return;
         }
-        balance = balance.add(amount);
-        System.out.println("Deposited: " + amount);
+
+        boolean isTrue = true;
+        while (isTrue) {
+            System.out.println("1. Deposit");
+            System.out.println("2. Withdraw");
+            System.out.println("3. Get Balance");
+            System.out.println("4. Exit");
+
+            int choice1 = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (choice1) {
+                case 1 -> myAccount.deposit(scanner);
+                case 2 -> myAccount.withdraw(scanner);
+                case 3 -> myAccount.getBalance();
+                case 4 -> isTrue = false;
+                default -> System.out.println("Invalid input!");
             }
-    public boolean withdraw(BigDecimal amount) {
-
-        // Step 1: invalid amount (0 or negative)
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            System.out.println("Invalid amount");
-            return false;
         }
-
-        // Step 2: sufficient balance check
-        if (balance.compareTo(amount) >= 0) {
-            balance = balance.subtract(amount);
-            return true;
-        }
-
-        // Step 3: insufficient balance
-        System.out.println("insufficient balance");
-        return false;
     }
 
 }
