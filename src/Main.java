@@ -28,7 +28,7 @@ public class Main {
                     break;
                 }
                 case 2: {
-                    getAccount  (scanner, accounts);
+                    getAccount  (scanner);
                     break;
                 }
                 case 3: {

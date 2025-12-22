@@ -18,17 +18,20 @@ public class Account {
 
     public String getAccountNumber() {
         return accountNumber;
-
+    }
+    public String getPin(){
+        return pin;
+    }
+    public String getBalance(){
+        return balance.toString();
+    }
+    public void getCurrentBalance(){
+        System.out.println("your current balance is: "+balance);
     }
 
     public boolean isAuthenticated(String pin) {
         return this.pin.equals(pin);
     }
-
-    public void getBalance() {
-        System.out.println("$ " + balance);
-    }
-
     public void deposit(Scanner sc) {
         System.out.print("Enter amount: ");
         BigDecimal amount = new BigDecimal(sc.nextLine());
